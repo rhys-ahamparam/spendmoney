@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Spend a Fortune</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#111a33;
+      --muted:#93a4c7;
+      --text:#e9efff;
+      --accent:#3ddc97;
+      --danger:#ff5d5d;
+      --border:rgba(255,255,255,.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(61,220,151,.14), transparent 60%),
+                  radial-gradient(1200px 600px at 80% 20%, rgba(125,92,255,.14), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(11,16,32,.75);
+      border-bottom: 1px solid var(--border);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .top{
+      display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;gap:12px;align-items:center;min-width:260px;
+    }
+    .avatar{
+      width:44px;height:44px;border-radius:50%;
+      background: linear-gradient(135deg, rgba(61,220,151,.9), rgba(125,92,255,.9));
+      display:grid;place-items:center;
+      border:1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      font-weight:800;
+    }
+    .title{
+      display:flex;flex-direction:column;line-height:1.1;
+    }
+    .title b{font-size:14px;letter-spacing:.3px}
+    .title span{font-size:12px;color:var(--muted)}
+    .money{
+      display:flex;gap:10px;align-items:baseline;justify-content:flex-end;flex:1;
+    }
+    .money .label{color:var(--muted);font-size:12px}
+    .money .value{
+      font-size:26px;font-weight:900;letter-spacing:.2px;
+    }
+    .controls{display:flex;gap:10px;align-items:center}
+    button{
+      appearance:none;border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .05s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+    }
+    button:hover{background: rgba(255,255,255,.09)}
+    button:active{transform: translateY(1px)}
+    button.primary{
+      background: rgba(61,220,151,.15);
+      border-color: rgba(61,220,151,.35);
+    }
+    button.danger{
+      background: rgba(255,93,93,.12);
+      border-color: rgba(255,93,93,.35);
+    }
+    button:disabled{
+      opacity:.45;cursor:not-allowed;
+    }
+
+    main{padding: 18px 0 40px}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat( auto-fit, minmax(240px, 1fr) );
+      gap:14px;
+    }
+    .card{
+      background: rgba(17,26,51,.92);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      overflow:hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,.18);
+      display:flex;flex-direction:column;
+      min-height: 248px;
+    }
+    .cardTop{
+      display:flex;gap:12px;align-items:center;
+      padding:14px 14px 8px;
+    }
+    .emoji{
+      width:44px;height:44px;border-radius:14px;
+      display:grid;place-items:center;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      font-size:22px;
+      flex:0 0 auto;
+    }
+    .meta{flex:1}
+    .name{font-weight:900;font-size:14px}
+    .price{color:var(--muted);font-size:12px;margin-top:2px}
+    .qtyLine{
+      padding: 0 14px 10px;
+      display:flex;align-items:center;justify-content:space-between;
+      color: var(--muted);
+      font-size:12px;
+    }
+    .qtyLine b{color:var(--text)}
+    .actions{
+      margin-top:auto;
+      padding: 12px 14px 14px;
+      display:flex;gap:10px;align-items:center;
+    }
+    .actions .btn{
+      flex:1;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight:900;
+    }
+    .actions .sell{border-color: rgba(255,255,255,.12)}
+    .actions .buy{
+      background: rgba(61,220,151,.14);
+      border-color: rgba(61,220,151,.35);
+    }
+    .actions input{
+      width:74px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      font-weight:800;
+      text-align:center;
+      outline:none;
+    }
+    .actions input:focus{
+      border-color: rgba(61,220,151,.5);
+      box-shadow: 0 0 0 3px rgba(61,220,151,.12);
+    }
+
+    .footerNote{
+      margin-top:16px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .sr{position:absolute;left:-9999px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="top">
+        <div class="brand">
+          <div class="avatar" aria-hidden="true">$</div>
+          <div class="title">
+            <b>Spend a Fortune</b>
+            <span>Buy & sell items to see how far the money goes</span>
+          </div>
+        </div>
+
+        <div class="money" aria-live="polite">
+          <div class="label">Balance</div>
+          <div class="value" id="balance">$0</div>
+        </div>
+
+        <div class="controls">
+          <button class="primary" id="reset">Reset</button>
+          <button id="wipe">Clear Save</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid" id="grid"></div>
+
+    <div class="footerNote">
+      Tip: Use the quantity box to buy/sell multiple at once. Your progress saves automatically in your browser.
+    </div>
+  </main>
+
+  <script>
+    // --------- Data ----------
+    const STARTING_MONEY = 100_000_000_000; // $100B like the original vibe
+
+    // A starter catalog (you can add more items easily)
+    const ITEMS = [
+      { id:"big-mac", name:"Big Mac", price:2, emoji:"🍔" },
+      { id:"flip-flops", name:"Flip Flops", price:3, emoji:"🩴" },
+      { id:"coke-pack", name:"Coca-Cola Pack", price:5, emoji:"🥤" },
+      { id:"movie-ticket", name:"Movie Ticket", price:12, emoji:"🎟️" },
+      { id:"book", name:"Book", price:15, emoji:"📘" },
+      { id:"lobster", name:"Lobster Dinner", price:45, emoji:"🦞" },
+      { id:"video-game", name:"Video Game", price:60, emoji:"🎮" },
+      { id:"echo", name:"Smart Speaker", price:99, emoji:"🔊" },
+      { id:"netflix-year", name:"Year of Streaming", price:100, emoji:"📺" },
+      { id:"jordans", name:"Air Jordans", price:125, emoji:"👟" },
+      { id:"airpods", name:"Wireless Earbuds", price:199, emoji:"🎧" },
+      { id:"console", name:"Gaming Console", price:299, emoji:"🕹️" },
+      { id:"drone", name:"Drone", price:350, emoji:"🛸" },
+      { id:"smartphone", name:"Smartphone", price:699, emoji:"📱" },
+      { id:"bike", name:"Bike", price:800, emoji:"🚲" },
+      { id:"kitten", name:"Kitten", price:1500, emoji:"🐱" },
+      { id:"puppy", name:"Puppy", price:1500, emoji:"🐶" },
+      { id:"horse", name:"Horse", price:2500, emoji:"🐴" },
+      { id:"farmland", name:"Acre of Farmland", price:3000, emoji:"🌾" },
+      { id:"designer-bag", name:"Designer Handbag", price:5500, emoji:"👜" },
+      { id:"hot-tub", name:"Hot Tub", price:6000, emoji:"🛁" },
+      { id:"diamond-ring", name:"Diamond Ring", price:10000, emoji:"💍" },
+      { id:"jetski", name:"Jet Ski", price:12000, emoji:"🛥️" },
+      { id:"rolex", name:"Luxury Watch", price:15000, emoji:"⌚" },
+      { id:"truck", name:"Pickup Truck", price:30000, emoji:"🛻" },
+      { id:"tesla", name:"Electric Car", price:75000, emoji:"🚗" },
+      { id:"monster-truck", name:"Monster Truck", price:150000, emoji:"🚙" },
+      { id:"ferrari", name:"Supercar", price:250000, emoji:"🏎️" },
+      { id:"home", name:"Single Family Home", price:300000, emoji:"🏠" },
+      { id:"gold-bar", name:"Gold Bar", price:700000, emoji:"🪙" },
+      { id:"franchise", name:"Fast Food Franchise", price:1_500_000, emoji:"🍟" },
+      { id:"superbowl-ad", name:"Big Game Ad", price:5_250_000, emoji:"📣" },
+      { id:"yacht", name:"Yacht", price:7_500_000, emoji:"🛳️" },
+      { id:"f1", name:"Formula 1 Car", price:15_000_000, emoji:"🏁" },
+      { id:"heli", name:"Attack Helicopter", price:31_000_000, emoji:"🚁" },
+      { id:"mansion", name:"Mansion", price:45_000_000, emoji:"🏰" },
+      { id:"movie", name:"Make a Movie", price:100_000_000, emoji:"🎬" },
+      { id:"jumbo", name:"Boeing 747", price:148_000_000, emoji:"✈️" },
+      { id:"art", name:"Famous Painting", price:780_000_000, emoji:"🖼️" },
+      { id:"skyscraper", name:"Skyscraper", price:850_000_000, emoji:"🏙️" },
+      { id:"cruise", name:"Cruise Ship", price:930_000_000, emoji:"🚢" },
+      { id:"nba", name:"Pro Basketball Team", price:2_120_000_000, emoji:"🏀" },
+    ];
+
+    // --------- State ----------
+    const STORAGE_KEY = "spend_fortune_v1";
+
+    /** @type {{balance:number, owned:Record<string, number>}} */
+    let state = loadState() ?? {
+      balance: STARTING_MONEY,
+      owned: Object.fromEntries(ITEMS.map(i => [i.id, 0])),
+    };
+
+    // --------- Helpers ----------
+    function moneyFmt(n){
+      // No decimals; always show commas
+      return "$" + Math.max(0, Math.floor(n)).toLocaleString("en-US");
+    }
+
+    function clampInt(v, min, max){
+      v = Number.isFinite(v) ? Math.floor(v) : min;
+      return Math.min(max, Math.max(min, v));
+    }
+
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        const parsed = JSON.parse(raw);
+        if(typeof parsed?.balance !== "number" || typeof parsed?.owned !== "object") return null;
+        // Ensure all items exist
+        for(const it of ITEMS){
+          if(typeof parsed.owned[it.id] !== "number") parsed.owned[it.id] = 0;
+        }
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function setBalanceText(){
+      document.getElementById("balance").textContent = moneyFmt(state.balance);
+    }
+
+    // --------- UI ----------
+    const grid = document.getElementById("grid");
+
+    function render(){
+      setBalanceText();
+      grid.innerHTML = "";
+
+      for(const item of ITEMS){
+        const owned = state.owned[item.id] ?? 0;
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const top = document.createElement("div");
+        top.className = "cardTop";
+
+        const emoji = document.createElement("div");
+        emoji.className = "emoji";
+        emoji.textContent = item.emoji ?? "🛒";
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = item.name;
+
+        const price = document.createElement("div");
+        price.className = "price";
+        price.textContent = moneyFmt(item.price);
+
+        meta.appendChild(name);
+        meta.appendChild(price);
+
+        top.appendChild(emoji);
+        top.appendChild(meta);
+
+        const qtyLine = document.createElement("div");
+        qtyLine.className = "qtyLine";
+        qtyLine.innerHTML = `Owned: <b id="owned-${item.id}">${owned.toLocaleString("en-US")}</b>`;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const qty = document.createElement("input");
+        qty.type = "number";
+        qty.min = "1";
+        qty.step = "1";
+        qty.value = "1";
+        qty.inputMode = "numeric";
+        qty.setAttribute("aria-label", `Quantity for ${item.name}`);
+
+        const sellBtn = document.createElement("button");
+        sellBtn.className = "btn sell";
+        sellBtn.textContent = "Sell";
+
+        const buyBtn = document.createElement("button");
+        buyBtn.className = "btn buy";
+        buyBtn.textContent = "Buy";
+
+        function getQty(){
+          return clampInt(parseInt(qty.value, 10), 1, 1_000_000_000);
+        }
+
+        function refreshButtons(){
+          const q = getQty();
+          const canBuy = state.balance >= item.price * q;
+          const canSell = owned >= q;
+          buyBtn.disabled = !canBuy;
+          sellBtn.disabled = !canSell;
+        }
+
+        qty.addEventListener("input", refreshButtons);
+
+        buyBtn.addEventListener("click", () => {
+          const q = getQty();
+          const cost = item.price * q;
+          if(state.balance < cost) return;
+
+          state.balance -= cost;
+          state.owned[item.id] = (state.owned[item.id] ?? 0) + q;
+          saveState();
+          render(); // simple rerender
+        });
+
+        sellBtn.addEventListener("click", () => {
+          const q = getQty();
+          const have = state.owned[item.id] ?? 0;
+          if(have < q) return;
+
+          state.owned[item.id] = have - q;
+          state.balance += item.price * q;
+          saveState();
+          render();
+        });
+
+        actions.appendChild(sellBtn);
+        actions.appendChild(qty);
+        actions.appendChild(buyBtn);
+
+        card.appendChild(top);
+        card.appendChild(qtyLine);
+        card.appendChild(actions);
+
+        grid.appendChild(card);
+
+        // Set initial button state (must happen after owned is known)
+        // (Owned changes on rerender anyway)
+        const canBuy = state.balance >= item.price;
+        const canSell = owned >= 1;
+        buyBtn.disabled = !canBuy;
+        sellBtn.disabled = !canSell;
+      }
+    }
+
+    // --------- Controls ----------
+    document.getElementById("reset").addEventListener("click", () => {
+      state.balance = STARTING_MONEY;
+      for(const it of ITEMS) state.owned[it.id] = 0;
+      saveState();
+      render();
+    });
+
+    document.getElementById("wipe").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      state = {
+        balance: STARTING_MONEY,
+        owned: Object.fromEntries(ITEMS.map(i => [i.id, 0])),
+      };
+      render();
+    });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
